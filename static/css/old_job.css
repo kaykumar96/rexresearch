@@ -1,0 +1,220 @@
+ /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. 
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .hide_opt{
+       visibility: hidden;
+      }
+      .t_disable{
+        background-color:#A9A8A6;
+      }
+      .t_disable a{
+        color:black;
+      }
+      .t_enable{
+        background-color:#FF5733;
+      }
+      .a{
+        color:white;
+      }
+  #locationField, #controls {
+       position: relative;
+       width: 100%;
+  }
+   #autocomplete {
+       top: 0px;
+       left: 0px;
+       width: 90%;
+  }
+  /*#address {
+       border: 1px solid #000090;
+       background-color: #f0f0ff;
+       width: 480px;
+       padding-right: 2px;
+  }
+   #address td {
+       font-size: 10pt;
+  }*/
+   .field {
+       width: 99%;
+  }
+   .slimField {
+       width: 80px;
+  }
+   .wideField {
+       width: 200px;
+  }
+   .error{
+       color: red;
+  }
+   .tablesection {
+       background: #eee;
+       padding: 10px;
+       display: block;
+  }
+   .container1 {
+       display: block;
+       position: relative;
+       padding-left: 35px;
+       margin-bottom: 12px;
+       cursor: pointer;
+       font-size: 15px;
+  }
+   .container1 input {
+       position: absolute;
+       opacity: 0;
+       cursor: pointer;
+  }
+   .checkmark1 {
+       position: absolute;
+       top: 0;
+       left: 0;
+       height: 25px;
+       width: 25px;
+       color: #08919C;
+       background-color: #fff;
+       border-radius: 50%;
+       border: 1px solid black;
+  }
+   .container1:hover input ~ .checkmark1 {
+       background-color: #ccc;
+  }
+  /* When the checkbox is checked, add a blue background */
+   .container1 input:checked ~ .checkmark1 {
+       background-color: #474747;
+  }
+  /* Create the checkmark/indicator (hidden when not checked) */
+   .checkmark1:after {
+       content: "";
+       position: absolute;
+       display: none;
+  }
+  /* Show the checkmark when checked */
+   .container1 input:checked ~ .checkmark1:after {
+       display: block;
+  }
+   .container1 .checkmark1:after {
+       top: 9px;
+       left: 9px;
+       width: 8px;
+       height: 8px;
+       border-radius: 50%;
+       background: white;
+  }
+  .container2 {
+    display: block;
+       position: relative;
+       padding-left: 35px;
+       margin-bottom: 12px;
+       cursor: pointer;
+       font-size: 15px;
+  }
+
+/* Hide the browser's default checkbox */
+.container2 input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    color: #08919C;
+    background-color: #fff;
+    border: 1px solid black;
+
+          
+}
+
+/* On mouse-over, add a grey background color */
+.container2:hover input ~ .checkmark2 {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container2 input:checked ~ .checkmark2 {
+    background-color: #474747;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark2:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.container2 input:checked ~ .checkmark2:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.container2 .checkmark2:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+
+
+    /*top: 9px;
+       left: 9px;
+       width: 8px;
+       height: 8px;
+       border-radius: 50%;
+       background: white;*/
+}
+  
+    .error{
+      color: red;
+    }
+    #autocomplete{
+      width: 90%;
+    }
+    .rate_error{
+    color: red;
+    }
+    .iptype_error{
+     color: red;
+    }
+    .address_error{
+    color: red;
+    }
+    .dimension_error{
+      color:red;
+    }
+    .unit_error{
+     color: red;
+    }
+    .a:link{
+      text-decoration: none;
+      color:#fff;
+    }
+    .a:active{
+      text-decoration: none;
+      
+    }
+    .a:visited{
+      text-decoration: none;
+      color:#fff;
+    }
+    .a:hover{
+      text-decoration: none;
+      
+    }
