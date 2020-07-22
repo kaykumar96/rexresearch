@@ -11,7 +11,7 @@ urlpatterns =[
 					url(r'^content/show/(?P<pk>[0-9]+)$',content.show.as_view(),name='content_show'),
 
 					url(r'^contentdetails/list/$',contentdetails.list.as_view(),name='content_details_list'),
-					url(r'^contentdetails/show/(?P<pk>[0-9]+)$',contentdeatils.show.as_view(),name='content_details_show'),
+					url(r'^contentdetails/show/(?P<pk>[0-9]+)$',contentdetails.show.as_view(),name='content_details_show'),
 
 				])),
 			]
