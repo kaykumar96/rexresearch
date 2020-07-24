@@ -39,7 +39,6 @@ for content in texts:
     soup = BeautifulSoup(content, 'lxml')
     print(soup)
     content_heading = soup.find('div', align='center')
-    content_
     
     ##collect urls,image,header,content from text variable and replicate the same for all the pages
     print('~~~~~~~~~~~~~~~~~~')
