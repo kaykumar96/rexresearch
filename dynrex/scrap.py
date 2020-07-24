@@ -1,7 +1,46 @@
 from bs4 import BeautifulSoup
 import requests
 
-with open('http://www.rexresearch.com/HDAC1/hdac1.html') as html_file:
-	soup = BeautifulSoup(html_file, 'lxml')
+# #for html file within directory
+# # with open('http://www.rexresearch.com/HDAC1/hdac1.html') as html_file:
+# # 	soup = BeautifulSoup(html_file, 'lxml')
 
-print(soup)	
+
+# # for global html pages
+# source = requests.get('http://www.rexresearch.com/HDAC1/hdac1.html').text
+
+# soup = BeautifulSoup(source, 'html.parser')
+
+
+
+# html_body = soup.find('body')
+# for content in html_body.find_all('hr'):
+# 	print(content.next_siblings)
+# 	print(type(content.next_siblings))
+# 	print("~~~~~~~~~~~~~~~~~~~~")
+
+
+
+############################################################################################################
+
+from urllib.request import urlopen
+# import bs4
+# import requests
+# import json
+
+r = requests.get('http://www.rexresearch.com/HDAC1/hdac1.html')
+raw_text=r.text
+texts=raw_text.split('<hr width="100%" size="2">')
+#print(len(texts))
+#print(texts[2])
+
+for content in texts:
+    print('~~~~~~~~~~~~~~~~~')
+    soup = BeautifulSoup(content, 'lxml')
+    print(soup)
+    content_heading = soup.find('div', align='center')
+    content_
+    
+    ##collect urls,image,header,content from text variable and replicate the same for all the pages
+    print('~~~~~~~~~~~~~~~~~~')
+
