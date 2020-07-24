@@ -37,9 +37,29 @@ texts=raw_text.split('<hr width="100%" size="2">')
 for content in texts:
     print('~~~~~~~~~~~~~~~~~')
     soup = BeautifulSoup(content, 'lxml')
-    print(soup)
-    content_heading = soup.find('div', align='center')
-    
+    # print(soup)
+    # print('+++++++++++++++')
+    file = None
+    try:
+    	content_heading = soup.find('div', align='center').text
+    except:
+    	content_heading = None	
+    try:
+    	link = soup.find('a', href=True)
+    	link = link['href']
+    	if '.pdf' in link:
+    		file = link
+    		link = None
+    except:
+    	link = None	
+
+
+    print(content_heading)
+    print("+++++++")
+    print(link)
+    print("++++++++")
+    print(file)
+
     ##collect urls,image,header,content from text variable and replicate the same for all the pages
-    print('~~~~~~~~~~~~~~~~~~')
+   
 
