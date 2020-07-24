@@ -1,8 +1,8 @@
 /__pycache__/*
 */__pycache__/*
 */*/__pycache__/*
-# /rexresearch/settings.py
-# */migrations/*
+/rexresearch/settings.py
+*/migrations/*
 /.idea
 
 /resources/*
