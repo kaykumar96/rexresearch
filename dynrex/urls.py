@@ -16,6 +16,9 @@ urlpatterns =[
 
 				])),
 			url(r'contentlist/', tempcontentlist, name='temp_contentlist'),
-			url(r'addcontentdetails/(?P<content_id>\d+)$', tempaddcontentdetails, name='temp_addcontentdetails')
+			url(r'addcontentdetails/(?P<content_id>\d+)$', tempaddcontentdetails, name='temp_addcontentdetails'),
+			url(r'addcontentdetails/submit_contentdetails/$',submit_contentdetails, name='submit_contentdetails'),
+			url(r'contentdetailslist/(?P<content_id>\d+)$', tempcontentdetailslist, name='temp_contentdetailslist'),
+			
 			#url(r'branch/add/(?P<branch_id>\d+)$',views.add_branch, name='edit_branch'),
 			]
