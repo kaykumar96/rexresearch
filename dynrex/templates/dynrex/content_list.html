@@ -1,0 +1,32 @@
+{% extends 'dynrex/main.html' %}
+{% load static %}
+{% block content %}
+
+	<h2 class="text-primary text-center">Content List</h2>
+	<div class='row'>
+		{% for content  in content_list %}
+			<div class="col col-lg-4 col-md-6 col-sm-6 col-12 text-center">
+                <div class="card border-dark mb-3" style="max-width: 20rem;" id="hoverCard">
+                
+                    <div class="card-header font-weight-bold text-light bg-dark">{{content.content_name}}</div>
+                    <div class="card-body"> 
+                        <p class="card-text text-left">{{content.content_type}}</p>
+                        
+                        <div class='card-footer'>
+                          <a href="{% url 'temp_addcontentdetails' content_id=content.id %}" data-product="1" data-action="add" 
+                          class="btn btn-sm btn-outline-warning text-dark m-1 add-btn update-cart" title="Click to view">
+                          Add Details
+                        </a>
+                       <!--  <a href="/courses/list/1" 
+                    class="btn  btn-sm btn-outline-primary text-dark m-1 add-btn align-right">
+                    View
+                    </a> -->
+                      </div>
+                      </div>
+                </div>
+            </div>	
+        {% endfor %}	
+
+	</div>
+
+{% endblock content %}

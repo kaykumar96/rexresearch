@@ -8,12 +8,10 @@ from django.db.models import Q
 # Create your views here.
 
 class contentlist(generics.ListCreateAPIView):
-	queryset = Content.objects.filter(status=0).all()
+	queryset = Content.objects.all()
 	serializer_class = ContentSerializer
 	# permission_classes = [IsAuthenticated,]
 	# authentication_classes = [TokenAuthentication]
-
-
 	def get_queryset(self):
 		""" allow rest api to filter by submissions """
 		queryset     = Content.objects.all()
@@ -30,8 +28,6 @@ class contentdetailslist(generics.ListCreateAPIView):
 	serializer_class = ContentDetailsSerializer
 	# permission_classes = [IsAuthenticated,]
 	# authentication_classes = [TokenAuthentication]
-
-
 	def get_queryset(self):
 		""" allow rest api to filter by submissions """
 		queryset     = ContentDetails.objects.select_related('content').all()
@@ -42,3 +38,16 @@ class contentdetailsshow(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = ContentDetailsSerializer
 	# permission_classes = [IsAuthenticated,]
 	# authentication_classes = [TokenAuthentication]
+
+
+
+def tempcontentlist(request):
+	content_list = Content.objects.all()
+	context = {'content_list':content_list}
+	return render(request, 'dynrex/content_list.html', context)	
+
+
+def tempaddcontentdetails(request, content_id=0):
+	content_list = Content.objects.all()
+	context = {'content_list':content_list}
+	return render(request, 'dynrex/add_contentdetails.html', context)		
