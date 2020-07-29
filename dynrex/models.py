@@ -5,11 +5,11 @@ import pytz
 
 
 class Content(models.Model):
-    id           = models.AutoField(primary_key=True)
-    content_name = models.CharField(max_length=150)
-    content_type = models.CharField(max_length=150, null=True, blank=True) 
-    status       = models.SmallIntegerField(default=0)
-    added_date   = models.DateTimeField(auto_now_add=True)
+    id              = models.AutoField(primary_key=True)
+    content_name    = models.CharField(max_length=150)
+    content_details = models.TextField(null=True, blank=True) 
+    status          = models.SmallIntegerField(default=0)
+    added_date      = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'content'
@@ -24,6 +24,7 @@ class ContentDetails(models.Model):
 	heading_details = models.TextField(null=True, blank=True)
 	file            = models.FileField(upload_to='file/',blank=True,null=True)
 	image           = models.ImageField(upload_to='image/',blank=True,null=True)
+	added_date      = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		db_table = 'content_details'
