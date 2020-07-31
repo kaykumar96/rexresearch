@@ -22,8 +22,8 @@ class ContentDetails(models.Model):
 	content         = models.ForeignKey(Content,on_delete=models.SET_NULL,blank=True,null=True)      
 	heading         = models.CharField(max_length=200)
 	heading_details = models.TextField(null=True, blank=True)
-	file            = models.FileField(upload_to='file/',blank=True,null=True)
-	image           = models.ImageField(upload_to='image/',blank=True,null=True)
+	# file            = models.FileField(upload_to='file/',blank=True,null=True)
+	# image           = models.ImageField(upload_to='image/',blank=True,null=True)
 	added_date      = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -31,4 +31,11 @@ class ContentDetails(models.Model):
 
 	def __str__(self):
 		return '%s' % self.heading	
-          
+
+class ContentDetailsImage(models.Model):
+    contentdetails   = models.ForeignKey(ContentDetails,on_delete=models.CASCADE, related_name='contendetails_image')
+    upload_image     = models.ImageField(upload_to='image/',blank=True,null=True)          
+
+class ContentDetailsFile(models.Model):
+    contentdetails   = models.ForeignKey(ContentDetails,on_delete=models.CASCADE, related_name='contendetails_file')
+    upload_file      = models.FileField(upload_to='file/',blank=True,null=True)              
