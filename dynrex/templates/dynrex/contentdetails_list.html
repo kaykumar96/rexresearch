@@ -7,7 +7,7 @@
 		<h3>Content details list for "{{content_data.content_name}}"</h3>
 	</div>
 	<div class="module-body table">
-		<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped  display" width="100%">
+		<!-- <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped  display" width="100%">
             <thead>
                     <tr>
                         <th>Heading</th>
@@ -27,6 +27,30 @@
                 {% endfor %}                    
                                          
             </tbody>
+        </table> -->
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped  display" width="100%">
+        	{% for contentdetails in contentdetails_data %}
+        		<tr>
+        			<th colspan='2'>{{contentdetails.heading}}</th>
+        		</tr>
+        		<tr>
+        			<td rowspan="2">{{contentdetails.heading_details}}</td>
+        			<td>
+        				{% for img in contentdetails.contendetails_image.all %}
+					        <img src="{{img.upload_image}}">
+					    {% endfor %}
+        			</td>
+        		</tr>
+        		<tr>
+        			<td>
+        				{% for file in contentdetails.contendetails_file.all %}
+					        {{file.upload_file}}<br>
+					    {% endfor %}
+        			</td>
+        		</tr>
+        		<tr><td colspan='2'></td></tr>
+        	{% endfor %}
+        </table>
 	</div>
 </div>
 {% endblock content %}
