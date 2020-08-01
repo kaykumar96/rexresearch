@@ -7,7 +7,7 @@ import pytz
 class Content(models.Model):
     id              = models.AutoField(primary_key=True)
     content_name    = models.CharField(max_length=150)
-    content_details = models.TextField(null=True, blank=True) 
+    title           = models.CharField(max_length=150, null=True, blank=True)
     status          = models.SmallIntegerField(default=0)
     added_date      = models.DateTimeField(auto_now_add=True)
 
@@ -20,8 +20,7 @@ class Content(models.Model):
 class ContentDetails(models.Model):
 	id              = models.AutoField(primary_key=True)
 	content         = models.ForeignKey(Content,on_delete=models.SET_NULL,blank=True,null=True)      
-	heading         = models.CharField(max_length=200)
-	heading_details = models.TextField(null=True, blank=True)
+	content_para    = models.TextField(null=True, blank=True)
 	# file            = models.FileField(upload_to='file/',blank=True,null=True)
 	# image           = models.ImageField(upload_to='image/',blank=True,null=True)
 	added_date      = models.DateTimeField(auto_now_add=True)
@@ -38,4 +37,8 @@ class ContentDetailsImage(models.Model):
 
 class ContentDetailsFile(models.Model):
     contentdetails   = models.ForeignKey(ContentDetails,on_delete=models.CASCADE, related_name='contendetails_file')
-    upload_file      = models.FileField(upload_to='file/',blank=True,null=True)              
+    upload_file      = models.FileField(upload_to='file/',blank=True,null=True)     
+
+class ContentDetailsUrl(models.Model):
+	contentdetails = models.ForeignKey(ContentDetails, on_delete=models.CASCADE, related_name='contentdetails_url')
+	url_name       = models.CharField(max_length=300,null=True, blank=True)             
