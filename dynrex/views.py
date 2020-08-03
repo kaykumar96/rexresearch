@@ -125,8 +125,8 @@ class JsonLoad(APIView):
 				respons['files'].append(fileurl)
 			else:
 				respons['urls'].append(url_tag['href'])
-		for data in soup.find_all('body'):
-			respons['content'].append(data.text)
+		for data in soup.body.stripped_strings:
+			respons['content'].append(data)
 		# for header in soup.find_all('div'):
 			# respons['content'].append(header.text)
 		for img in soup.find_all("img"):
