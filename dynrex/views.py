@@ -106,7 +106,7 @@ import os
 class JsonLoad(APIView):
 	def post(self,request):
 		today = datetime.datetime.now()
-		url_get= request.GET.get('url', None)
+		url_get= request.POST.get('url', None)
 		img_url = url_get.split('/')[3]
 		print(img_url)
 		url2 = 'http://rexresearch.com/'
