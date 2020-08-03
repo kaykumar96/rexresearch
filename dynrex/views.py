@@ -1,8 +1,11 @@
 from django.shortcuts import render,redirect
 from rest_framework import generics
-from dynrex.models import Content, ContentDetails, ContentDetailsImage, ContentDetailsFile
+from rest_framework.views import APIView
+from dynrex.models import Content, ContentDetails, ContentDetailsImage, ContentDetailsFile,ContentDetailsUrl
 from dynrex.contentSerializers import ContentSerializer, ContentDetailsSerializer
 from django.db.models import Q
+from django.http import JsonResponse
+import json
 # from rest_framework.permissions import IsAuthenticated
 # from rest_framework.authentication import  TokenAuthentication
 # Create your views here.
@@ -91,4 +94,53 @@ def submit_contentdetails(request):
 	    	contentdetailsfile_data.contentdetails = contentdetails_data
 	    	contentdetailsfile_data.upload_file    = file
 	    	contentdetailsfile_data.save()	
-	    return redirect('temp_contentlist')	
+	    return redirect('temp_contentlist')
+
+import requests
+from bs4 import BeautifulSoup
+import json
+import datetime
+import re
+import os
+
+class JsonLoad(APIView):
+	def post(self,request):
+		today = datetime.datetime.now()
+		url_get= request.GET.get('url', None)
+		img_url = url_get.split('/')[3]
+		print(img_url)
+		url2 = 'http://rexresearch.com/'
+		result = requests.get(url_get)
+		src = result.content
+		soup = BeautifulSoup(src, 'lxml')
+		respons = {"urls": [],
+					'files':[],
+					'images':[],
+					'content':[]
+					}
+
+		for url_tag in soup.find_all('a', href=True):
+			if '.pdf' in url_tag['href']:
+				fileurl = url2 +img_url + '/' +url_tag['href']
+				respons['files'].append(fileurl)
+			else:
+				respons['urls'].append(url_tag['href'])
+		for data in soup.find_all('body'):
+			respons['content'].append(data.text)
+		# for header in soup.find_all('div'):
+			# respons['content'].append(header.text)
+		for img in soup.find_all("img"):
+			imgUrls = url2 +img_url+ '/'+img['src']
+			respons['images'].append(imgUrls)
+		# print(respons['content'])
+		contenr_obj = Content.objects.create(content_name = img_url, added_date = today)
+		content_details = ContentDetails.objects.create(content=contenr_obj,content_para = respons['content'],added_date=today)
+		for images in respons['images']:
+			ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=images)
+		for files in respons['files']:
+			ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=files)
+			
+		ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=respons['urls'])
+
+		return JsonResponse(respons,safe=False)
+

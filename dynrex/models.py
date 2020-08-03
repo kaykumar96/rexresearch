@@ -29,7 +29,7 @@ class ContentDetails(models.Model):
 		db_table = 'content_details'
 
 	def __str__(self):
-		return '%s' % self.heading	
+		return '%s' % self.content	
 
 class ContentDetailsImage(models.Model):
     contentdetails   = models.ForeignKey(ContentDetails,on_delete=models.CASCADE, related_name='contendetails_image')

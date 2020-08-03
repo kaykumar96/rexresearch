@@ -5,3 +5,6 @@ from .models import *
 
 admin.site.register(Content)
 admin.site.register(ContentDetails)
+admin.site.register(ContentDetailsImage)
+admin.site.register(ContentDetailsFile)
+admin.site.register(ContentDetailsUrl)

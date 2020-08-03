@@ -5,15 +5,17 @@ from os.path  import basename
 import re
 import os
 
-url = 'http://rexresearch.com/invnindx.htm'
-url2 = 'http://rexresearch.com/'
+url = 'http://rexresearch.com/fischer/fischer.htm'
+# url2 = 'http://rexresearch.com/'
 result = requests.get(url)
 src = result.content
 soup = BeautifulSoup(src, 'lxml')
 respons = {"urls": [],
 			'files':[],
 			'images':[],
-			'content':[]
+			'content':[],
+			'p_tag_content':[],
+			'b_tag_content':[]
 			}
 
 for url_tag in soup.find_all('a', href=True):
@@ -22,54 +24,58 @@ for url_tag in soup.find_all('a', href=True):
 		respons['files'].append(fileurl)
 	else:
 		respons['urls'].append(url_tag['href'])
+for i in soup.find_all('p'):
+	respons['p_tag_content'].append(i.text)
+for br in soup.find_all('b'):
+	respons['b_tag_content'].append(br.text)
 for header in soup.find_all('div'):
 	respons['content'].append(header.text)
 for img in soup.find_all("img"):
 	imgUrls = url + '/' +img['src']
 	respons['images'].append(imgUrls)
-
+print(respons)
 # respons2 = {"urls": [],
 # 					'files':[],
 # 					'images':[],
-# 					'content':[]}
+					# 'content':[]}
 
-for urls_in in respons['urls']:
-	if urls_in != 'index.htm' and urls_in !='#inventor' and urls_in != '#subject':
-		print(url2+urls_in)
-		name = urls_in.split('.')[0]
-		result2 = requests.get(url2+urls_in)
-		src2 = result2.content
-		soup2 = BeautifulSoup(src2, 'lxml')
-		respons2 = {"urls": [],
-					'files':[],
-					'images':[],
-					'content':[],
-					'p_tag_content':[]
-					}
-		for url_tag1 in soup2.find_all('a', href=True):
-			respons2['urls'].append(url_tag1['href'])
-			if '.pdf' in url_tag1['href']:
-				fileurl = url + '/' +url_tag1['href']
-				respons2['files'].append(fileurl)
+# for urls_in in respons['urls']:
+# 	if urls_in != 'index.htm' and urls_in !='#inventor' and urls_in != '#subject':
+# 		print(url2+urls_in)
+# 		name = urls_in.split('.')[0]
+# 		result2 = requests.get(url2+urls_in)
+# 		src2 = result2.content
+# 		soup2 = BeautifulSoup(src2, 'lxml')
+# 		respons2 = {"urls": [],
+# 					'files':[],
+# 					'images':[],
+# 					'content':[],
+# 					'p_tag_content':[]
+# 					}
+# 		for url_tag1 in soup2.find_all('a', href=True):
+# 			respons2['urls'].append(url_tag1['href'])
+# 			if '.pdf' in url_tag1['href']:
+# 				fileurl = url + '/' +url_tag1['href']
+# 				respons2['files'].append(fileurl)
 			
-		for header in soup2.find_all('div'):
-			respons2['content'].append(header.text)
+# 		for header in soup2.find_all('div'):
+# 			respons2['content'].append(header.text)
 
-		for img in soup2.find_all("img"):
-			imgUrls = url2 + urls_in.split('.')[0].split('/')[0]+ '/' +img['src']
-			respons2['images'].append(imgUrls)
+# 		for img in soup2.find_all("img"):
+# 			imgUrls = url2 + urls_in.split('.')[0].split('/')[0]+ '/' +img['src']
+# 			respons2['images'].append(imgUrls)
 
-		for i in soup2.findAll('p'):
-			respons2['p_tag_content'].append(i.text)
+# 		for i in soup2.findAll('p'):
+# 			respons2['p_tag_content'].append(i.text)
 
-		# print(respons2['p_tag_content'])
-		#creating folder & file based on url name and data dump into the file
-		dirname = os.path.dirname(name)
-		if not os.path.exists(dirname):
-			os.makedirs(dirname)
-			file = open("{}.txt".format(name), "w+")
-			file.write(json.dumps(respons2))
-			file.close()
+# 		# print(respons2['p_tag_content'])
+# 		#creating folder & file based on url name and data dump into the file
+# 		dirname = os.path.dirname(name)
+# 		if not os.path.exists(dirname):
+# 			os.makedirs(dirname)
+# 			file = open("{}.txt".format(name), "w+")
+# 			file.write(json.dumps(respons2))
+# 			file.close()
 
 
 # pages = []
