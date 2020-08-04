@@ -28,10 +28,14 @@ from urllib.request import urlopen
 # import requests
 # import json
 
-r = requests.get('http://www.rexresearch.com/HDAC1/hdac1.html')
-raw_text=r.text
-texts=raw_text.split('<hr width="100%" size="2">')
+r         = requests.get('http://www.rexresearch.com/saphonian/aouini.htm')
+raw_text  = r.text
+# page_soup = BeautifulSoup(raw_text, 'lxml')
+# hr_tag    = page_soup.find('hr')
+# print(str(hr_tag))
+texts     = raw_text.split('<hr')
 #print(len(texts))
+# print(raw_text)
 #print(texts[2])
 
 for content in texts:
@@ -39,26 +43,41 @@ for content in texts:
     soup = BeautifulSoup(content, 'lxml')
     # print(soup)
     # print('+++++++++++++++')
-    file = None
+    file      = None
+    img_list  = []
+    file_list = []
+    url_list  = []
     try:
     	content_heading = soup.find('div', align='center').text
-    except:
-    	content_heading = None	
+    except:	
+        try:
+            content_heading = soup.find('div', style="text-align: center;").text
+        except:
+            content_heading = None
     try:
-    	link = soup.find('a', href=True)
-    	link = link['href']
-    	if '.pdf' in link:
-    		file = link
-    		link = None
+        for url in soup.find_all('a', href=True):
+            if '.pdf' in url:
+                file_list.append(url['href'])
+            else:
+                url_list.append(url['href'])
     except:
-    	link = None	
+        pass                
+
+    try:
+        for img in soup.find_all("img"):
+            img_list.append(img['src'])
+    except:
+        pass        
+    
 
 
     print(content_heading)
     print("+++++++")
-    print(link)
+    print(url_list)
     print("++++++++")
-    print(file)
+    print(file_list)
+    print("+++++++++")
+    print(img_list)
 
     ##collect urls,image,header,content from text variable and replicate the same for all the pages
    
