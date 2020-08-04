@@ -68,33 +68,33 @@ def tempcontentdetailslist(request, content_id):
 
 def submit_contentdetails(request):
 	if request.method == 'POST':
-	    contentdetails_id = request.POST['hiddenId']
-	    if contentdetails_id!='':
-	        contentdetails_data = ContentDetails.objects.get(id = contentdetails_id)
-	    else:
-	        contentdetails_data = ContentDetails()
-	    
-	    
-	    contentdetails_data.content_id      = request.POST['content']
-	    contentdetails_data.heading         = request.POST['heading']
-	    contentdetails_data.heading_details = request.POST['heading_details']
-	    # contentdetails_data.file            = request.FILES['file']
-	    # contentdetails_data.image           = request.FILES['image']
-	    contentdetails_data.save()
-	    print(request.FILES.getlist('image'))
-	    print('~~~~~~~~~~~~~')
-	    print(request.FILES.getlist('file'))
-	    for image in request.FILES.getlist('image'):
-	    	contentdetailsimage_data = ContentDetailsImage()
-	    	contentdetailsimage_data.contentdetails = contentdetails_data
-	    	contentdetailsimage_data.upload_image   = image
-	    	contentdetailsimage_data.save()
-	    for file in request.FILES.getlist('file'):
-	    	contentdetailsfile_data  = ContentDetailsFile()    
-	    	contentdetailsfile_data.contentdetails = contentdetails_data
-	    	contentdetailsfile_data.upload_file    = file
-	    	contentdetailsfile_data.save()	
-	    return redirect('temp_contentlist')
+		contentdetails_id = request.POST['hiddenId']
+		if contentdetails_id!='':
+			contentdetails_data = ContentDetails.objects.get(id = contentdetails_id)
+		else:
+			contentdetails_data = ContentDetails()
+		
+		
+		contentdetails_data.content_id      = request.POST['content']
+		contentdetails_data.heading         = request.POST['heading']
+		contentdetails_data.heading_details = request.POST['heading_details']
+		# contentdetails_data.file            = request.FILES['file']
+		# contentdetails_data.image           = request.FILES['image']
+		contentdetails_data.save()
+		print(request.FILES.getlist('image'))
+		print('~~~~~~~~~~~~~')
+		print(request.FILES.getlist('file'))
+		for image in request.FILES.getlist('image'):
+			contentdetailsimage_data = ContentDetailsImage()
+			contentdetailsimage_data.contentdetails = contentdetails_data
+			contentdetailsimage_data.upload_image   = image
+			contentdetailsimage_data.save()
+		for file in request.FILES.getlist('file'):
+			contentdetailsfile_data  = ContentDetailsFile()    
+			contentdetailsfile_data.contentdetails = contentdetails_data
+			contentdetailsfile_data.upload_file    = file
+			contentdetailsfile_data.save()	
+		return redirect('temp_contentlist')
 
 import requests
 from bs4 import BeautifulSoup
@@ -102,6 +102,7 @@ import json
 import datetime
 import re
 import os
+import bs4
 
 class JsonLoad(APIView):
 	def post(self,request):
@@ -125,10 +126,17 @@ class JsonLoad(APIView):
 				respons['files'].append(fileurl)
 			else:
 				respons['urls'].append(url_tag['href'])
-		for data in soup.body.stripped_strings:
-			respons['content'].append(data)
-		# for header in soup.find_all('div'):
-			# respons['content'].append(header.text)
+		# for data in soup.body.stripped_strings:
+		# 	respons['content'].append(data)
+		text = ''
+		for header in soup.find_all('div'):
+			ee = header.find('hr')
+			while(ee):
+				ee = ee.next_sibling
+				if isinstance(ee, bs4.element.Tag):
+					respons['content'].append(ee.get_text())
+				# elif isinstance(ee, bs4.element.NavigableString):
+				# 	respons['content'].append(ee)
 		for img in soup.find_all("img"):
 			imgUrls = url2 +img_url+ '/'+img['src']
 			respons['images'].append(imgUrls)
