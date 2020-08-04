@@ -110,25 +110,74 @@ class JsonLoad(APIView):
 		content_name = url_get.split('/')[3] 
 		url2         = 'http://rexresearch.com/'
 		result       = requests.get(url_get).text
-		result_texts = raw_text.split('<hr width="100%" size="2">')
+		result_texts = result.split('<hr')
+		content_obj = Content.objects.create(content_name = content_name, added_date = today)
 		for content in result_texts:
 			print('~~~~~~~~~~~~~~~~~')
 			soup = BeautifulSoup(content, 'lxml')
 			# print(soup)
 			# print('+++++++++++++++')
-			file = None
+			file      = None
+			img_list  = []
+			file_list = []
+			url_list  = []
 			try:
 				content_heading = soup.find('div', align='center').text
-			except:
-				content_heading = None	
+				#content_heading.extract()
+			except:	
+			    try:
+			        content_heading = soup.find('div', style="text-align: center;").text
+			        #content_heading.extract()
+			    except:
+			        content_heading = None
 			try:
-				link = soup.find('a', href=True)
-				link = link['href']
-				if '.pdf' in link:
-					file = link
-					link = None
+			    for url in soup.find_all('a', href=True):
+			        if '.pdf' in url:
+			            file_list.append(url['href'])
+			        else:
+			            url_list.append(url['href'])
+			        url.extract()    
 			except:
-				link = None	
+			    pass                
+
+			try:
+			    for img in soup.find_all("img"):
+			        img_list.append(img['src'])
+			        img.extract()
+			except:
+			    pass        
+
+			content_para = soup.text    
+
+			print(content_heading)
+			print("+++++++")
+			print(url_list)
+			print("++++++++")
+			print(file_list)
+			print("+++++++++")
+			print(img_list)	
+			response = {
+						'content_heading' : content_heading,
+						'url_list'        : url_list,
+						'file_list'       : file_list,
+						'img_list'        : img_list 
+						}
+			if content_heading is not None:
+				content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading ,content_para = content_para.encode('unicode_escape'),added_date=today)
+				if len(img_list)>0:
+					for img in img_list:
+						ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=img)
+				if len(file_list)>0:
+					for file in file_list:
+						ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=file)
+				if len(url_list)>0:
+					for url in url_list:
+						ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=url)
+		return JsonResponse(response,safe=False)				
+
+
+
+
 	# def post(self,request):
 	# 	today = datetime.datetime.now()
 	# 	url_get= request.POST.get('url', None)

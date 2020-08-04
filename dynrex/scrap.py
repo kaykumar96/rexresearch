@@ -48,36 +48,46 @@ for content in texts:
     file_list = []
     url_list  = []
     try:
-    	content_heading = soup.find('div', align='center').text
+        content_heading = soup.find('div', align='center').text
     except:	
         try:
-            content_heading = soup.find('div', style="text-align: center;").text
+            content_heading = soup.find('div', style="text-align: center;").text 
         except:
             content_heading = None
+           
     try:
         for url in soup.find_all('a', href=True):
             if '.pdf' in url:
                 file_list.append(url['href'])
             else:
                 url_list.append(url['href'])
+            url.extract()    
     except:
         pass                
 
     try:
         for img in soup.find_all("img"):
             img_list.append(img['src'])
+            img.extract()
     except:
         pass        
     
+    content_para = soup.text
 
 
     print(content_heading)
-    print("+++++++")
+    print("")
+    print("url list :")
     print(url_list)
-    print("++++++++")
+    print("")
+    print("file list :")
     print(file_list)
-    print("+++++++++")
+    print("")
+    print("image list :")
     print(img_list)
+    print("")
+    print("content paragraph :")
+    print(content_para)
 
     ##collect urls,image,header,content from text variable and replicate the same for all the pages
    
