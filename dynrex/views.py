@@ -108,47 +108,54 @@ class JsonLoad(APIView):
 	def post(self,request):
 		today = datetime.datetime.now()
 		url_get= request.GET.get('url', None)
-		img_url = url_get.split('/')[3]
-		print(img_url)
+		content_name = url_get.split('/')[3]
 		url2 = 'http://rexresearch.com/'
-		result = requests.get(url_get)
-		src = result.content
-		soup = BeautifulSoup(src, 'lxml')
-		respons = {"urls": [],
-					'files':[],
-					'images':[],
-					'content':[]
-					}
+		result = requests.get(url_get).text
+		src = result.split('<hr')
+		for content in src:
+			soup = BeautifulSoup(content, 'lxml')
+			respons = {"urls": [],
+						'files':[],
+						'images':[],
+						'content':[]
+						}
 
-		for url_tag in soup.find_all('a', href=True):
-			if '.pdf' in url_tag['href']:
-				fileurl = url2 +img_url + '/' +url_tag['href']
-				respons['files'].append(fileurl)
-			else:
-				respons['urls'].append(url_tag['href'])
-		# for data in soup.body.stripped_strings:
-		# 	respons['content'].append(data)
-		text = ''
-		for header in soup.find_all('div'):
-			ee = header.find('hr')
-			while(ee):
-				ee = ee.next_sibling
-				if isinstance(ee, bs4.element.Tag):
-					respons['content'].append(ee.get_text())
-				# elif isinstance(ee, bs4.element.NavigableString):
-				# 	respons['content'].append(ee)
-		for img in soup.find_all("img"):
-			imgUrls = url2 +img_url+ '/'+img['src']
-			respons['images'].append(imgUrls)
-		# print(respons['content'])
-		contenr_obj = Content.objects.create(content_name = img_url, added_date = today)
-		content_details = ContentDetails.objects.create(content=contenr_obj,content_para = respons['content'],added_date=today)
-		for images in respons['images']:
-			ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=images)
-		for files in respons['files']:
-			ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=files)
-			
-		ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=respons['urls'])
+			for url_tag in soup.find_all('a', href=True):
+				if '.pdf' in url_tag['href']:
+					fileurl = url2 +content_name + '/' +url_tag['href']
+					respons['files'].append(fileurl)
+				else:
+					respons['urls'].append(url_tag['href'])
+
+			for img in soup.find_all("img"):
+				imgUrls = url2 +content_name+ '/'+img['src']
+				respons['images'].append(imgUrls)
+			for para in soup.find_all('body'):
+				content_para = para.text
+				mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+					("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+					("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+				for k, v in mapping:
+					content_para = content_para.replace(k, v)
+					content_para = content_para.replace("'",'')
+			try:
+				content_heading = soup.find('div', align='center').text
+				#content_heading.extract()
+			except:	
+			    try:
+			        content_heading = soup.find('div', style="text-align: center;").text
+			        #content_heading.extract()
+			    except:
+			        content_heading = None
+
+			contenr_obj = Content.objects.create(content_name = content_name, added_date = today)
+			content_details = ContentDetails.objects.create(content=contenr_obj,content_heading=content_heading ,content_para = content_para.encode('unicode_escape'),added_date=today)
+			for images in respons['images']:
+				ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=images)
+			for files in respons['files']:
+				ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=files)
+				
+			ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=respons['urls'])
 
 		return JsonResponse(respons,safe=False)
 
