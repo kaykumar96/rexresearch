@@ -132,7 +132,7 @@ class JsonLoad(APIView):
 			        content_heading = None
 			try:
 			    for url in soup.find_all('a', href=True):
-			        if '.pdf' in url:
+			        if '.pdf' in url['href']:
 			            file_list.append(url['href'])
 			        else:
 			            url_list.append(url['href'])
@@ -148,6 +148,12 @@ class JsonLoad(APIView):
 			    pass        
 
 			content_para = soup.text    
+			mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+					("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+					("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+			for k, v in mapping:
+				content_para = content_para.replace(k, v)
+				content_para = content_para.replace("'",'')
 
 			print(content_heading)
 			print("+++++++")
@@ -163,7 +169,7 @@ class JsonLoad(APIView):
 						'img_list'        : img_list 
 						}
 			if content_heading is not None:
-				content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading ,content_para = content_para.encode('unicode_escape'),added_date=today)
+				content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading.encode('unicode_escape') ,content_para = content_para.encode('unicode_escape'),added_date=today)
 				if len(img_list)>0:
 					for img in img_list:
 						ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=img)
