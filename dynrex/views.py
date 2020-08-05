@@ -6,6 +6,14 @@ from dynrex.contentSerializers import ContentSerializer, ContentDetailsSerialize
 from django.db.models import Q
 from django.http import JsonResponse
 import json
+import requests
+from bs4 import BeautifulSoup
+import json
+import datetime
+import re
+import os
+import bs4
+
 # from rest_framework.permissions import IsAuthenticated
 # from rest_framework.authentication import  TokenAuthentication
 # Create your views here.
@@ -96,13 +104,6 @@ def submit_contentdetails(request):
 			contentdetailsfile_data.save()	
 		return redirect('temp_contentlist')
 
-import requests
-from bs4 import BeautifulSoup
-import json
-import datetime
-import re
-import os
-import bs4
 
 class JsonLoad(APIView):
 	def post(self,request):
@@ -112,13 +113,14 @@ class JsonLoad(APIView):
 		url2 = 'http://rexresearch.com/'
 		result = requests.get(url_get).text
 		src = result.split('<hr')
-		for content in src:
-			soup = BeautifulSoup(content, 'lxml')
-			respons = {"urls": [],
+		respons = {"urls": [],
 						'files':[],
 						'images':[],
 						'content':[]
 						}
+		contenr_obj = Content.objects.create(content_name = content_name, added_date = today)
+		for content in src:
+			soup = BeautifulSoup(content, 'lxml')
 
 			for url_tag in soup.find_all('a', href=True):
 				if '.pdf' in url_tag['href']:
@@ -126,7 +128,6 @@ class JsonLoad(APIView):
 					respons['files'].append(fileurl)
 				else:
 					respons['urls'].append(url_tag['href'])
-
 			for img in soup.find_all("img"):
 				imgUrls = url2 +content_name+ '/'+img['src']
 				respons['images'].append(imgUrls)
@@ -148,7 +149,6 @@ class JsonLoad(APIView):
 			    except:
 			        content_heading = None
 
-			contenr_obj = Content.objects.create(content_name = content_name, added_date = today)
 			content_details = ContentDetails.objects.create(content=contenr_obj,content_heading=content_heading ,content_para = content_para.encode('unicode_escape'),added_date=today)
 			for images in respons['images']:
 				ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=images)
@@ -156,6 +156,5 @@ class JsonLoad(APIView):
 				ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=files)
 				
 			ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=respons['urls'])
-
 		return JsonResponse(respons,safe=False)
 
