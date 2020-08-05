@@ -60,9 +60,22 @@ def tempaddcontentdetails(request, content_id, contentdetails_id=0):
 	return render(request, 'dynrex/add_contentdetails.html', context)	
 
 def tempcontentdetailslist(request, content_id):
-	content_data        = Content.objects.get(id=content_id)
-	contentdetials_data = ContentDetails.objects.filter(content=content_id).all()
-	context = {'content_data': content_data, 'contentdetails_data': contentdetials_data}
+	content_data         = Content.objects.get(id=content_id)
+	contentdetials_query = ContentDetails.objects.filter(content=content_id).all()
+	contentdetails_data  = [] 
+	for contentdetails in contentdetials_query:
+		data = {}
+		data['content_heading'] = contentdetails.content_heading[2:-1]
+		data['content_para']    = contentdetails.content_para[2:-1]
+		data['image']           = []
+		data['url']             = []
+		for img in contentdetails.contendetails_image.all():
+			data['image'].append(img.upload_image)
+		for url in contentdetails.contentdetails_url.all():
+			data['url'].append(url.url_name)	
+		contentdetails_data.append(data)	
+
+	context = {'content_data': content_data, 'contentdetails_data': contentdetails_data}
 	print(context)
 	return render(request, 'dynrex/contentdetails_list.html', context)			
 
@@ -107,7 +120,7 @@ class JsonLoad(APIView):
 	
 	def post(self, request):
 		def map_unwanted_tags(to_map):
-			mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+			mapping = [ ('width="100%" size="2">', ""), ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
 						("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
 						("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
 			for k, v in mapping:

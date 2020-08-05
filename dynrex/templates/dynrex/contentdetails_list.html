@@ -31,20 +31,20 @@
         <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped  display" width="100%">
         	{% for contentdetails in contentdetails_data %}
         		<tr>
-        			<th colspan='2'>{{(contentdetails.content_heading).decode("utf-8")}}</th>
+        			<th colspan='2'>{{contentdetails.content_heading}}</th>
         		</tr>
         		<tr>
         			<td rowspan="2">{{contentdetails.content_para}}</td>
         			<td>
-        				{% for img in contentdetails.contendetails_image.all %}
-					        <img src="{{img.upload_image}}">
+        				{% for img in contentdetails.image %}
+					        <img src="{{img}}">
 					    {% endfor %}
         			</td>
         		</tr>
         		<tr>
         			<td>
-        				{% for file in contentdetails.contentdetails_url.all %}
-					        {{file.url_name}}<br>
+        				{% for file in contentdetails.url %}
+					        {{file}}<br>
 					    {% endfor %}
         			</td>
         		</tr>
