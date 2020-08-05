@@ -104,10 +104,19 @@ import re
 import os
 
 class JsonLoad(APIView):
+	
 	def post(self, request):
+		def map_unwanted_tags(to_map):
+			mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+						("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+						("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+			for k, v in mapping:
+				to_map = to_map.replace(k, v)
+				to_map = to_map.replace("'",'')
+			return to_map		
 		today        = datetime.datetime.now()
 		url_get      = request.POST.get('url', None)
-		content_name = url_get.split('/')[3] 
+		content_name = request.POST.get('content_name', None) 
 		url2         = 'http://rexresearch.com/'
 		result       = requests.get(url_get).text
 		result_texts = result.split('<hr')
@@ -148,12 +157,13 @@ class JsonLoad(APIView):
 			    pass        
 
 			content_para = soup.text    
-			mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
-					("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
-					("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
-			for k, v in mapping:
-				content_para = content_para.replace(k, v)
-				content_para = content_para.replace("'",'')
+			content_para = map_unwanted_tags(content_para)
+			# mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+			# 		("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+			# 		("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+			# for k, v in mapping:
+			# 	content_para = content_para.replace(k, v)
+			# 	content_para = content_para.replace("'",'')
 
 			print(content_heading)
 			print("+++++++")
@@ -169,6 +179,14 @@ class JsonLoad(APIView):
 						'img_list'        : img_list 
 						}
 			if content_heading is not None:
+				content_heading = map_unwanted_tags(content_heading)
+				content_para    = content_para.replace(content_heading, '')
+				# mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+				# 	("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+				# 	("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+				# for k, v in mapping:
+				# 	content_heading = content_heading.replace(k, v)
+				# 	content_heading = content_heading.replace("'",'')
 				content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading.encode('unicode_escape') ,content_para = content_para.encode('unicode_escape'),added_date=today)
 				if len(img_list)>0:
 					for img in img_list:

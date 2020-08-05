@@ -38,20 +38,31 @@ texts     = raw_text.split('<hr')
 # print(raw_text)
 #print(texts[2])
 
+def map_unwanted_tags(to_map):
+    mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+                ("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+                ("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+    for k, v in mapping:
+        to_map = to_map.replace(k, v)
+        to_map = to_map.replace("'",'')
+    return to_map   
+
 for content in texts:
     print('~~~~~~~~~~~~~~~~~')
     soup = BeautifulSoup(content, 'lxml')
     # print(soup)
     # print('+++++++++++++++')
-    file      = None
-    img_list  = []
-    file_list = []
-    url_list  = []
+    
+    img_list        = []
+    file_list       = []
+    url_list        = []
     try:
         content_heading = soup.find('div', align='center').text
+        #content_head.extract()
     except:	
         try:
             content_heading = soup.find('div', style="text-align: center;").text 
+            #content_head.extract()
         except:
             content_heading = None
            
@@ -73,8 +84,13 @@ for content in texts:
         pass        
     
     content_para = soup.text
+    content_para = map_unwanted_tags(content_para)
 
+    if content_heading is not None:
+        content_heading = map_unwanted_tags(content_heading)
+        content_para    = content_para.replace(content_heading,'')
 
+    print("content_heading :")
     print(content_heading)
     print("")
     print("url list :")
