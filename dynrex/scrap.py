@@ -28,7 +28,7 @@ from urllib.request import urlopen
 # import requests
 # import json
 
-r         = requests.get('http://www.rexresearch.com/saphonian/aouini.htm')
+r         = requests.get('http://www.rexresearch.com/covidatabase/covidatabase.html')
 raw_text  = r.text
 # page_soup = BeautifulSoup(raw_text, 'lxml')
 # hr_tag    = page_soup.find('hr')
@@ -71,7 +71,8 @@ for content in texts:
             if '.pdf' in url:
                 file_list.append(url['href'])
             else:
-                url_list.append(url['href'])
+                url_dict = {url.text:url['href']}
+                url_list.append(url_dict)
             url.extract()    
     except:
         pass                

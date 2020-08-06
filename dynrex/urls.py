@@ -15,7 +15,8 @@ urlpatterns =[
 					url(r'^contentdetails/show/(?P<pk>[0-9]+)$',contentdetailsshow.as_view(),name='content_details_show'),
 
 				])),
-			url(r'contentlist/', tempcontentlist, name='temp_contentlist'),
+			url(r'contentlist/$', tempcontentlist, name='temp_contentlist'),
+			url(r'contentlist/(?P<content_id>\d+)$', tempsubcontentlist, name='temp_subcontentlist'),
 			url(r'addcontentdetails/(?P<content_id>\d+)$', tempaddcontentdetails, name='temp_addcontentdetails'),
 			url(r'addcontentdetails/submit_contentdetails/$',submit_contentdetails, name='submit_contentdetails'),
 			url(r'contentdetailslist/(?P<content_id>\d+)$', tempcontentdetailslist, name='temp_contentdetailslist'),

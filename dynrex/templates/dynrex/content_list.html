@@ -13,10 +13,12 @@
                         <p class="card-text text-left">{{content.content_description}}</p>
                         
                         <div class='card-footer'>
-                          <!-- <a href="{% url 'temp_addcontentdetails' content_id=content.id %}" data-product="1" data-action="add" 
+                          {% if content.self_parent_content.all %}
+                          <a href="{% url 'temp_subcontentlist' content_id=content.id %}" data-product="1" data-action="add" 
                           class="btn btn-sm btn-outline-warning text-dark m-1 add-btn update-cart" title="Click to view">
-                          Add Details
-                        </a> -->
+                          View Sub Contents
+                        </a>
+                        {% endif %}
                        <!--  <a href="/courses/list/1" 
                     class="btn  btn-sm btn-outline-primary text-dark m-1 add-btn align-right">
                     View

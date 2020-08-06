@@ -5,6 +5,7 @@ from dynrex.models import Content, ContentDetails, ContentDetailsImage, ContentD
 from dynrex.contentSerializers import ContentSerializer, ContentDetailsSerializer
 from django.db.models import Q
 from django.http import JsonResponse
+from dynrex.functions import map_unwanted_tags, scrap_rexresearch_url
 import json
 # from rest_framework.permissions import IsAuthenticated
 # from rest_framework.authentication import  TokenAuthentication
@@ -45,9 +46,14 @@ class contentdetailsshow(generics.RetrieveUpdateDestroyAPIView):
 
 
 def tempcontentlist(request):
-	content_list = Content.objects.all()
+	content_list = Content.objects.filter(parent_content=None).all()
 	context = {'content_list':content_list}
 	return render(request, 'dynrex/content_list.html', context)	
+
+def tempsubcontentlist(request, content_id):
+	content_list = Content.objects.filter(parent_content=content_id).all()
+	context = {'content_list':content_list}
+	return render(request, 'dynrex/content_list.html', context)		
 
 
 def tempaddcontentdetails(request, content_id, contentdetails_id=0):
@@ -76,7 +82,6 @@ def tempcontentdetailslist(request, content_id):
 		contentdetails_data.append(data)	
 
 	context = {'content_data': content_data, 'contentdetails_data': contentdetails_data}
-	print(context)
 	return render(request, 'dynrex/contentdetails_list.html', context)			
 
 def submit_contentdetails(request):
@@ -118,137 +123,95 @@ import os
 
 class JsonLoad(APIView):
 	
-	def post(self, request):
-		def map_unwanted_tags(to_map):
-			mapping = [ ('width="100%" size="2">', ""), ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
-						("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
-						("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
-			for k, v in mapping:
-				to_map = to_map.replace(k, v)
-				to_map = to_map.replace("'",'')
-			return to_map		
-		today        = datetime.datetime.now()
-		url_get      = request.POST.get('url', None)
-		content_name = request.POST.get('content_name', None) 
-		url2         = 'http://rexresearch.com/'
-		result       = requests.get(url_get).text
-		result_texts = result.split('<hr')
-		content_obj = Content.objects.create(content_name = content_name, added_date = today)
-		for content in result_texts:
-			print('~~~~~~~~~~~~~~~~~')
-			soup = BeautifulSoup(content, 'lxml')
-			# print(soup)
-			# print('+++++++++++++++')
-			file      = None
-			img_list  = []
-			file_list = []
-			url_list  = []
-			try:
-				content_heading = soup.find('div', align='center').text
-				#content_heading.extract()
-			except:	
-			    try:
-			        content_heading = soup.find('div', style="text-align: center;").text
-			        #content_heading.extract()
-			    except:
-			        content_heading = None
-			try:
-			    for url in soup.find_all('a', href=True):
-			        if '.pdf' in url['href']:
-			            file_list.append(url['href'])
-			        else:
-			            url_list.append(url['href'])
-			        url.extract()    
-			except:
-			    pass                
+	def post(self, request):		
+		url_get       = request.POST.get('url', None)
+		content_name  = request.POST.get('content_name', None)
+		response      = scrap_rexresearch_url(url_get, content_name)
+		# page_url_list = response['page_url_list']
+		# url_get_list  = url_get.split('/')
+		# base_url_list = url_get_list[0:-1]
+		# base_url      = '/'.join(base_url_list)
+		# for each_url_dict in page_url_list:
+		# 	[(sub_content_name, sub_url_get)] = each_url_dict.items()
+		# 	sub_url_get  = base_url+'/'+sub_url_get
+		# 	sub_responce = scrap_rexresearch_url(sub_url_get, sub_content_name, response['content_obj_id'])
 
-			try:
-			    for img in soup.find_all("img"):
-			        img_list.append(img['src'])
-			        img.extract()
-			except:
-			    pass        
+		#print(response)
+		# today        = datetime.datetime.now()
+		# result       = requests.get(url_get).text
+		# result_texts = result.split('<hr')
+		# content_obj = Content.objects.create(content_name = content_name, added_date = today)
+		# for content in result_texts:
+		# 	print('~~~~~~~~~~~~~~~~~')
+		# 	soup = BeautifulSoup(content, 'lxml')
+		# 	# print(soup)
+		# 	# print('+++++++++++++++')
+		# 	file      = None
+		# 	img_list  = []
+		# 	file_list = []
+		# 	url_list  = []
+		# 	try:
+		# 		content_heading = soup.find('div', align='center').text
+		# 		#content_heading.extract()
+		# 	except:	
+		# 	    try:
+		# 	        content_heading = soup.find('div', style="text-align: center;").text
+		# 	        #content_heading.extract()
+		# 	    except:
+		# 	        content_heading = None
+		# 	try:
+		# 	    for url in soup.find_all('a', href=True):
+		# 	        if '.pdf' in url['href']:
+		# 	            file_list.append(url['href'])
+		# 	        else:
+		# 	            url_list.append(url['href'])
+		# 	        url.extract()    
+		# 	except:
+		# 	    pass                
 
-			content_para = soup.text    
-			content_para = map_unwanted_tags(content_para)
-			# mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
-			# 		("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
-			# 		("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
-			# for k, v in mapping:
-			# 	content_para = content_para.replace(k, v)
-			# 	content_para = content_para.replace("'",'')
+		# 	try:
+		# 	    for img in soup.find_all("img"):
+		# 	        img_list.append(img['src'])
+		# 	        img.extract()
+		# 	except:
+		# 	    pass        
 
-			print(content_heading)
-			print("+++++++")
-			print(url_list)
-			print("++++++++")
-			print(file_list)
-			print("+++++++++")
-			print(img_list)	
-			response = {
-						'content_heading' : content_heading,
-						'url_list'        : url_list,
-						'file_list'       : file_list,
-						'img_list'        : img_list 
-						}
-			if content_heading is not None:
-				content_heading = map_unwanted_tags(content_heading)
-				content_para    = content_para.replace(content_heading, '')
-				# mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
-				# 	("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
-				# 	("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
-				# for k, v in mapping:
-				# 	content_heading = content_heading.replace(k, v)
-				# 	content_heading = content_heading.replace("'",'')
-				content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading.encode('unicode_escape') ,content_para = content_para.encode('unicode_escape'),added_date=today)
-				if len(img_list)>0:
-					for img in img_list:
-						ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=img)
-				if len(file_list)>0:
-					for file in file_list:
-						ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=file)
-				if len(url_list)>0:
-					for url in url_list:
-						ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=url)
+		# 	content_para = soup.text    
+		# 	content_para = map_unwanted_tags(content_para)
+
+		# 	print(content_heading)
+		# 	print("+++++++")
+		# 	print(url_list)
+		# 	print("++++++++")
+		# 	print(file_list)
+		# 	print("+++++++++")
+		# 	print(img_list)	
+		# 	response = {
+		# 				'content_heading' : content_heading,
+		# 				'url_list'        : url_list,
+		# 				'file_list'       : file_list,
+		# 				'img_list'        : img_list 
+		# 				}
+		# 	if content_heading is not None:
+		# 		content_heading = map_unwanted_tags(content_heading)
+		# 		content_para    = content_para.replace(content_heading, '')
+		# 		# mapping = [ ("\t",""), ("&nbsp;", " "), ("&amp;", "&"), ("<p>", ""), ("</p>", ""), ("<br>", ""), 
+		# 		# 	("<ul>",""), ("</ul>",""), ("<ol>",""), ("</ol>",""), ("<li>",", "), ("</li>",""), ("<u>",""), 
+		# 		# 	("</u>",""), ("<b>",""), ("</b>",""), ("<i>",""), ("</i>",""), ("\n", " "),("<a>", " "),("</a>", " ")]
+		# 		# for k, v in mapping:
+		# 		# 	content_heading = content_heading.replace(k, v)
+		# 		# 	content_heading = content_heading.replace("'",'')
+		# 		content_details = ContentDetails.objects.create(content=content_obj, content_heading=content_heading.encode('unicode_escape') ,content_para = content_para.encode('unicode_escape'),added_date=today)
+		# 		if len(img_list)>0:
+		# 			for img in img_list:
+		# 				ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=img)
+		# 		if len(file_list)>0:
+		# 			for file in file_list:
+		# 				ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=file)
+		# 		if len(url_list)>0:
+		# 			for url in url_list:
+		# 				ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=url)
 		return JsonResponse(response,safe=False)				
 
 
-
-
-	# def post(self,request):
-	# 	today = datetime.datetime.now()
-	# 	url_get= request.POST.get('url', None)
-	# 	img_url = url_get.split('/')[3]
-	# 	print(img_url)
-	# 	url2 = 'http://rexresearch.com/'
-	# 	result = requests.get(url_get)
-	# 	src = result.content
-	# 	soup = BeautifulSoup(src, 'lxml')
-	# 	respons = {"urls": [],
-	# 				'files':[],
-	# 				'images':[],
-	# 				'content':[]
-	# 				}
-
-	# 	for url_tag in soup.find_all('a', href=True):
-	# 		if '.pdf' in url_tag['href']:
-	# 			fileurl = url2 +img_url + '/' +url_tag['href']
-	# 			respons['files'].append(fileurl)
-	# 		else:
-	# 			respons['urls'].append(url_tag['href'])
-	# 	for data in soup.body.stripped_strings:
-	# 		respons['content'].append(data)
-	# 	for img in soup.find_all("img"):
-	# 		imgUrls = url2 +img_url+ '/'+img['src']
-	# 		respons['images'].append(imgUrls)
-	# 	contenr_obj = Content.objects.create(content_name = img_url, added_date = today)
-	# 	content_details = ContentDetails.objects.create(content=contenr_obj,content_para = respons['content'],added_date=today)
-	# 	for images in respons['images']:
-	# 		ContentDetailsImage.objects.create(contentdetails=content_details, upload_image=images)
-	# 	for files in respons['files']:
-	# 		ContentDetailsFile.objects.create(contentdetails=content_details,upload_file=files)
-			
-	# 	ContentDetailsUrl.objects.create(contentdetails=content_details,url_name=respons['urls'])
-
-	# 	return JsonResponse(respons,safe=False)
 
